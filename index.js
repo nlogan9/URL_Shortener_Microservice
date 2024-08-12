@@ -29,26 +29,25 @@ app.get('/api/hello', function(req, res) {
 app.post('/api/shorturl', (req, res) => {
   let dest = req.body.url;
   let msg = {"original_url": dest, "short_url": urlnum};
-  const regex = /^(http(s)?:\/\/.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/;
+  const localhost = /^(http:\/\/)(localhost)/
+  const regex = /^(http:\/\/)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/;
   console.log(regex.test(dest));
-  if (!regex.test(dest)) {
+  console.log(localhost.test(dest));
+  console.log(dest);
+  if (!regex.test(dest) && !localhost.test(dest)) {
     msg = { "error": 'invalid url' };
     console.log("fail");
-  };
-  dns.lookup(dest, (err) => {
-    if (err) {
-      msg = { "error": 'invalid url' };
-      return;
-    };
+  } else {
     urlTable[urlnum] = dest;
     urlnum++;
     console.log(urlTable);
-  });
+  };
+  
   res.json(msg);
 })
 
 app.get('/api/shorturl/:URLNUM', (req, res) => {
-  //const newurl = urlTable[req.params.URLNUM];
+  const newurl = urlTable[req.params.URLNUM];
   //res.json({"url": newurl});
   res.redirect(newurl);
 })
